@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         TextView dateTextView = (TextView) findViewById(R.id.date_text);
         DateFormat df = android.text.format.DateFormat.getDateFormat(getApplicationContext());
-        dateTextView.setText(df.format(c.getTime()));
+        dateTextView.setText("On " + df.format(c.getTime()) + ", I ...");
     }
 
     private void saveThreeThingsToDatabase() {
