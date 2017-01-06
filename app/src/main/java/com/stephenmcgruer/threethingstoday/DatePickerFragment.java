@@ -30,6 +30,7 @@ public class DatePickerFragment extends DialogFragment {
 
         // Disallow future dates. For Lollipop, we need to set the timestamp to the last second
         // of the last allowed day, or that day will be visible but not selectable.
+        // TODO(smcgruer): I don't think this actually works. Need to test on real device.
         final Calendar maxCal = Calendar.getInstance();
         maxCal.set(Calendar.HOUR, 23);
         maxCal.set(Calendar.MINUTE, 59);
