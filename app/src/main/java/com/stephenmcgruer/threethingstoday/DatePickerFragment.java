@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import java.util.Calendar;
+
 public class DatePickerFragment extends DialogFragment {
 
     private DatePickerDialog.OnDateSetListener mOnDateSetListener = null;
@@ -26,9 +28,13 @@ public class DatePickerFragment extends DialogFragment {
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), mOnDateSetListener,
                 mInitialYear, mInitialMonth, mInitialDayOfMonth);
 
-        // Disallow future dates.
-        // TODO(smcgruer): Confirm that there are no edge cases to this approach.
-        dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        // Disallow future dates. For Lollipop, we need to set the timestamp to the last second
+        // of the last allowed day, or that day will be visible but not selectable.
+        final Calendar maxCal = Calendar.getInstance();
+        maxCal.set(Calendar.HOUR, 23);
+        maxCal.set(Calendar.MINUTE, 59);
+        maxCal.set(Calendar.SECOND, 59);
+        dialog.getDatePicker().setMaxDate(maxCal.getTimeInMillis());
 
         return dialog;
     }
