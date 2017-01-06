@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsContract.ThreeThingsEntry;
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsDbHelper;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
@@ -84,9 +85,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     private void updateDateText() {
-        // TODO(smcgruer): Format the date properly.
+        final Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, mSelectedYear);
+        c.set(Calendar.MONTH, mSelectedMonth);
+        c.set(Calendar.DAY_OF_MONTH, mSelectedDayOfMonth);
+
         TextView dateTextView = (TextView) findViewById(R.id.date_text);
-        dateTextView.setText(mSelectedYear + "/" + mSelectedMonth + "/" + mSelectedDayOfMonth);
+        DateFormat df = android.text.format.DateFormat.getDateFormat(getApplicationContext());
+        dateTextView.setText(df.format(c.getTime()));
     }
 
     private void saveThreeThingsToDatabase() {
