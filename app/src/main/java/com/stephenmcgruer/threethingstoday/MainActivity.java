@@ -2,22 +2,37 @@ package com.stephenmcgruer.threethingstoday;
 
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsContract.ThreeThingsEntry;
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsDbHelper;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
@@ -35,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         // Default to the current date.
         final Calendar c = Calendar.getInstance();
         mSelectedYear = c.get(Calendar.YEAR);
@@ -44,6 +62,24 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         updateDateText();
 
         saveThreeThingsToDatabase();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mi_export_database:
+                new DatabaseExportTask(this, mDbHelper).execute();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -198,6 +234,74 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             mFirstThingEditText.setText(strings[0]);
             mSecondThingEditText.setText(strings[1]);
             mThirdThingEditText.setText(strings[2]);
+        }
+    }
+
+    private static class DatabaseExportTask extends AsyncTask<Void, Void, File> {
+
+        private static final String TAG = "DatabaseExportTask";
+
+        private final Context mContext;
+        private final ThreeThingsDbHelper mDbHelper;
+
+        public DatabaseExportTask(Context context, ThreeThingsDbHelper dbHelper) {
+            mContext = context;
+            mDbHelper = dbHelper;
+        }
+
+        @Override
+        protected File doInBackground(Void... unused) {
+            StringBuilder sb = new StringBuilder(
+                TextUtils.join(",", ThreeThingsEntry.COLUMNS));
+            sb.append("\n");
+
+            SQLiteDatabase db = mDbHelper.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM " + ThreeThingsEntry.TABLE_NAME, null);
+            while (cursor.moveToNext()) {
+                List<String> data = new ArrayList(ThreeThingsEntry.COLUMNS.length);
+                for (String column : ThreeThingsEntry.COLUMNS) {
+                    data.add(cursor.getString(cursor.getColumnIndexOrThrow(column)));
+                }
+                sb.append(TextUtils.join(",", data));
+                sb.append("\n");
+            }
+
+            // NOTE(smcgruer): Folder must be kept in sync with the FileProvider xml
+            File tempDir = new File(mContext.getCacheDir() + File.separator + "database_exports");
+            if (!tempDir.exists() && !tempDir.mkdir()) {
+                Log.e(TAG, "doInBackground: unable to create temporary directory");
+                return null;
+            }
+
+            try {
+                File tempFile = File.createTempFile("three-things-today-data", ".csv", tempDir);
+                FileWriter fileWriter = new FileWriter(tempFile);
+                fileWriter.append(sb.toString());
+                fileWriter.close();
+                return tempFile;
+            } catch (IOException e) {
+                Log.e(TAG, "doInBackground: Error whilst writing temporary file", e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(File tempFile) {
+            super.onPostExecute(tempFile);
+
+            if (tempFile == null) {
+                Toast.makeText(mContext, "Unable to export database, please try again later",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+                    mContext, "com.stephenmcgruer.threethingstoday.fileprovider", tempFile));
+            sendIntent.setType("text/csv");
+            mContext.startActivity(
+                    Intent.createChooser(sendIntent, "Export database to ..."));
         }
     }
 }

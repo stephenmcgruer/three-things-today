@@ -1,57 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.stephenmcgruer.threethingstoday.MainActivity">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/date_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showDatePickerDialog"
-        android:text="[date placeholder]"
-        android:textSize="24sp" />
-
-    <EditText
-        android:id="@+id/first_edit_text"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/date_text"
-        android:gravity="left"
-        android:hint="Baked a chocolate cake"
-        android:inputType="textCapSentences"
-        android:maxLines="1" />
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:titleTextColor="@android:color/white"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <EditText
-        android:id="@+id/second_edit_text"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/first_edit_text"
-        android:gravity="left"
-        android:hint="Ran 5k"
-        android:inputType="textCapSentences"
-        android:maxLines="1" />
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.stephenmcgruer.threethingstoday.MainActivity">
 
-    <EditText
-        android:id="@+id/third_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/second_edit_text"
-        android:gravity="left"
-        android:hint="Read two chapters of my novel"
-        android:inputType="textCapSentences"
-        android:maxLines="1" />
+        <TextView
+            android:id="@+id/date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showDatePickerDialog"
+            android:text="[date placeholder]"
+            android:textSize="24sp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/third_edit_text"
-        android:onClick="submitThreeThings"
-        android:text="Submit" />
-</RelativeLayout>
+        <EditText
+            android:id="@+id/first_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/date_text"
+            android:gravity="left"
+            android:hint="Baked a chocolate cake"
+            android:inputType="textCapSentences"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/second_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/first_edit_text"
+            android:gravity="left"
+            android:hint="Ran 5k"
+            android:inputType="textCapSentences"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/third_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/second_edit_text"
+            android:gravity="left"
+            android:hint="Read two chapters of my novel"
+            android:inputType="textCapSentences"
+            android:maxLines="1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/third_edit_text"
+            android:onClick="submitThreeThings"
+            android:text="Submit" />
+    </RelativeLayout>
+</LinearLayout>

@@ -11,5 +11,14 @@ public class ThreeThingsContract {
         public static final String COLUMN_NAME_FIRST_THING = "firstThing";
         public static final String COLUMN_NAME_SECOND_THING = "secondThing";
         public static final String COLUMN_NAME_THIRD_THING = "thirdThing";
+
+        public static final String[] COLUMNS = {
+                COLUMN_NAME_YEAR,
+                COLUMN_NAME_MONTH,
+                COLUMN_NAME_DAY_OF_MONTH,
+                COLUMN_NAME_FIRST_THING,
+                COLUMN_NAME_SECOND_THING,
+                COLUMN_NAME_THIRD_THING
+        };
     }
 }
