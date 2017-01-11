@@ -24,6 +24,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,10 +45,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
+        View.OnFocusChangeListener, TextWatcher {
 
     private ThreeThingsDatabase mThreeThingsDatabase = null;
+
+    private final Timer mWriteDatabaseTimer = new Timer();
+    private TimerTask mWriteDatabaseTask = null;
 
     private int mSelectedYear = -1;
     private int mSelectedMonth = -1;
@@ -61,6 +70,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        EditText firstThingEditText = (EditText) findViewById(R.id.first_edit_text);
+        EditText secondThingEditText = (EditText) findViewById(R.id.second_edit_text);
+        EditText thirdThingEditText = (EditText) findViewById(R.id.third_edit_text);
+
+        firstThingEditText.setOnFocusChangeListener(this);
+        secondThingEditText.setOnFocusChangeListener(this);
+        thirdThingEditText.setOnFocusChangeListener(this);
+
+        firstThingEditText.addTextChangedListener(this);
+        secondThingEditText.addTextChangedListener(this);
+        thirdThingEditText.addTextChangedListener(this);
 
         // Default to the current date.
         final Calendar c = Calendar.getInstance();
@@ -103,7 +124,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         fragment.show(getSupportFragmentManager(), "DatePicker");
     }
 
-    public void submitThreeThings(View v) {
+    public void submitThreeThings() {
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
+
         String firstThingText = getTextFromEditText(R.id.first_edit_text);
         String secondThingText = getTextFromEditText(R.id.second_edit_text);
         String thirdThingText = getTextFromEditText(R.id.third_edit_text);
@@ -116,7 +140,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         values.put(ThreeThingsEntry.COLUMN_NAME_SECOND_THING, secondThingText);
         values.put(ThreeThingsEntry.COLUMN_NAME_THIRD_THING, thirdThingText);
 
-        new DatabaseWriteTask(mThreeThingsDatabase).execute(values);
+        if (mWriteDatabaseTask != null) {
+            mWriteDatabaseTask.cancel();
+        }
+        mWriteDatabaseTask = new DatabaseWriteTask(progressBar, mThreeThingsDatabase, values);
+        mWriteDatabaseTimer.schedule(mWriteDatabaseTask, 500l);
     }
 
     @Override
@@ -155,21 +183,53 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return editText.getText().toString();
     }
 
-    private static class DatabaseWriteTask extends AsyncTask<ContentValues, Void, Boolean> {
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+            // Focus changed, schedule a write.
+            submitThreeThings();
+        }
+    }
 
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        // Not implemented.
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // Not implemented.
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        // Text changed, schedule a write.
+        submitThreeThings();
+    }
+
+    private static class DatabaseWriteTask extends TimerTask {
+
+        private final ProgressBar mProgressBar;
         private final ThreeThingsDatabase mDatabase;
+        private final ContentValues mValues;
 
-        public DatabaseWriteTask(ThreeThingsDatabase database) {
+        public DatabaseWriteTask(ProgressBar progressBar,
+                                 ThreeThingsDatabase database,
+                                 ContentValues values) {
+            mProgressBar = progressBar;
             mDatabase = database;
+            mValues = values;
         }
 
         @Override
-        protected Boolean doInBackground(ContentValues... values) {
-            if (values.length < 1) {
-                return null;
-            }
-
-            return mDatabase.writeContentValues(values[0]);
+        public void run() {
+            mDatabase.writeContentValues(mValues);
+            mProgressBar.post(new Runnable() {
+                @Override
+                public void run() {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                }
+            });
         }
     }
 
