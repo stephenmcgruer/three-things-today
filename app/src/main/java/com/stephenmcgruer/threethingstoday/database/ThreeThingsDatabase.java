@@ -18,12 +18,15 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
 
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsContract.ThreeThingsEntry;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 public class ThreeThingsDatabase {
     private final ThreeThingsDbHelper mDbHelper;
@@ -88,9 +91,9 @@ public class ThreeThingsDatabase {
     }
 
     public synchronized String exportDatabaseToCsvString() {
-        StringBuilder sb = new StringBuilder(
-                TextUtils.join(",", ThreeThingsEntry.COLUMNS));
-        sb.append("\n");
+        StringWriter stringWriter = new StringWriter();
+        CSVWriter csvWriter = new CSVWriter(stringWriter);
+        csvWriter.writeNext(ThreeThingsEntry.COLUMNS);
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + ThreeThingsEntry.TABLE_NAME, null);
@@ -99,10 +102,15 @@ public class ThreeThingsDatabase {
             for (String column : ThreeThingsEntry.COLUMNS) {
                 data.add(cursor.getString(cursor.getColumnIndexOrThrow(column)));
             }
-            sb.append(TextUtils.join(",", data));
-            sb.append("\n");
+            csvWriter.writeNext(data.toArray(new String[0]));
         }
 
-        return sb.toString();
+        try {
+            csvWriter.close();
+        } catch (IOException e) {
+            // Ignore.
+        }
+
+        return stringWriter.toString();
     }
 }
