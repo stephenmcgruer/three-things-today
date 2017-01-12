@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         updateDateText();
 
-        saveThreeThingsToDatabase();
+        updateThreeThingsText();
     }
 
     @Override
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         mSelectedDayOfMonth = dayOfMonth;
 
         updateDateText();
-        saveThreeThingsToDatabase();
+        updateThreeThingsText();
     }
 
     private void updateDateText() {
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         dateTextView.setText("On " + df.format(c.getTime()) + ", I ...");
     }
 
-    private void saveThreeThingsToDatabase() {
+    private void updateThreeThingsText() {
         EditText firstThingEditText = (EditText) findViewById(R.id.first_edit_text);
         EditText secondThingEditText = (EditText) findViewById(R.id.second_edit_text);
         EditText thirdThingEditText = (EditText) findViewById(R.id.third_edit_text);
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         @Override
         protected void onPostExecute(Boolean success) {
             if (success) {
-                mMainActivity.saveThreeThingsToDatabase();
+                mMainActivity.updateThreeThingsText();
             } else {
                 Toast.makeText(mMainActivity, "Unable to import!", Toast.LENGTH_SHORT).show();
             }
