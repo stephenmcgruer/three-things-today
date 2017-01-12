@@ -15,13 +15,18 @@
 package com.stephenmcgruer.threethingstoday;
 
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -50,6 +55,8 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener,
         View.OnFocusChangeListener, TextWatcher {
+
+    private static final int DATABASE_IMPORT_CODE = 0;
 
     private ThreeThingsDatabase mThreeThingsDatabase = null;
 
@@ -107,6 +114,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             case R.id.mi_export_database:
                 new DatabaseExportTask(this, mThreeThingsDatabase).execute();
                 return true;
+            case R.id.mi_import_database:
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                try {
+                    startActivityForResult(Intent.createChooser(intent, "Select a file to open"),
+                            DATABASE_IMPORT_CODE);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(getApplicationContext(), "Please install a File Manager",
+                            Toast.LENGTH_LONG).show();
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -116,6 +135,28 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     protected void onDestroy() {
         mThreeThingsDatabase.close();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case DATABASE_IMPORT_CODE:
+                if (resultCode == RESULT_OK) {
+                    final Uri uri = data.getData();
+                    new AlertDialog.Builder(this)
+                            .setTitle("Import Database CSV")
+                            .setMessage("WARNING: Imported dates will override existing ones!")
+                            .setPositiveButton("Import", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new DatabaseImportTask(
+                                            MainActivity.this, mThreeThingsDatabase).execute(uri);
+                                }
+                            })
+                            .setNegativeButton("Cancel", null).show();
+                }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void showDatePickerDialog(View v) {
@@ -271,6 +312,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             mFirstThingEditText.setText(strings[0]);
             mSecondThingEditText.setText(strings[1]);
             mThirdThingEditText.setText(strings[2]);
+        }
+    }
+
+    private static class DatabaseImportTask extends AsyncTask<Uri, Void, Boolean> {
+
+        private final MainActivity mMainActivity;
+        private final ThreeThingsDatabase mThreeThingsDatabase;
+
+        public DatabaseImportTask(MainActivity mainActivity,
+                                  ThreeThingsDatabase threeThingsDatabase) {
+            mMainActivity = mainActivity;
+            mThreeThingsDatabase = threeThingsDatabase;
+        }
+
+        @Override
+        protected Boolean doInBackground(Uri... params) {
+            return mThreeThingsDatabase.importDatabase(
+                    mMainActivity.getContentResolver(), params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                mMainActivity.saveThreeThingsToDatabase();
+            } else {
+                Toast.makeText(mMainActivity, "Unable to import!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

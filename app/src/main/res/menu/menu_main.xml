@@ -3,4 +3,7 @@
     <item
         android:id="@+id/mi_export_database"
         android:title="Export Database" />
+    <item
+        android:id="@+id/mi_import_database"
+        android:title="Import Database" />
 </menu>
