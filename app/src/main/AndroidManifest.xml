@@ -24,6 +24,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+        <receiver
+            android:name=".ThreeThingsReceiver"
+            android:enabled="true"
+            android:exported="false"></receiver>
+        <service
+            android:name=".ThreeThingsNotificationIntentService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
