@@ -54,7 +54,7 @@
             android:layout_below="@id/first_edit_text"
             android:gravity="left"
             android:hint="Ran 5k"
-            android:inputType="textCapSentences"
+            android:inputType="textCapSentences|textAutoCorrect"
             android:maxLines="1" />
 
         <EditText
@@ -64,7 +64,7 @@
             android:layout_below="@id/second_edit_text"
             android:gravity="left"
             android:hint="Read two chapters of my novel"
-            android:inputType="textCapSentences"
+            android:inputType="textCapSentences|textAutoCorrect"
             android:maxLines="1" />
 
         <ProgressBar
