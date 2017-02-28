@@ -14,9 +14,7 @@
 
 package com.stephenmcgruer.threethingstoday;
 
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
         mThreeThingsDatabase = new ThreeThingsDatabase(getApplicationContext());
 
-        setupDailyNotification();
+        AlarmSetter.setDailyAlarm(this);
 
         setContentView(R.layout.activity_main);
 
@@ -104,25 +102,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         updateDateText();
 
         updateThreeThingsText();
-    }
-
-    private void setupDailyNotification() {
-        Intent notifyIntent = new Intent(this, ThreeThingsReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // TODO(smcgruer): Allow user to configure the time.
-        final Calendar cal = Calendar.getInstance();
-        if (cal.get(Calendar.HOUR_OF_DAY) >= 20)
-            cal.add(Calendar.DATE, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 20);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-                1000 * 60 * 60 * 24, pendingIntent);
     }
 
     @Override
@@ -154,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
                 return true;
             case R.id.mi_test_notification:
-                Intent notificationIntent = new Intent(this, ThreeThingsNotificationIntentService.class);
+                Intent notificationIntent = new Intent(this, NotificationIntentService.class);
                 startService(notificationIntent);
             default:
                 return super.onOptionsItemSelected(item);

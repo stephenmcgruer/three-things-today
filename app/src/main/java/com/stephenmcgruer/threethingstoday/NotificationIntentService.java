@@ -21,11 +21,11 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-public class ThreeThingsNotificationIntentService extends IntentService {
+public class NotificationIntentService extends IntentService {
     private static final int NOTIFICATION_ID = 7;
 
-    public ThreeThingsNotificationIntentService() {
-        super("ThreeThingsNotificationIntentService");
+    public NotificationIntentService() {
+        super("NotificationIntentService");
     }
 
     @Override

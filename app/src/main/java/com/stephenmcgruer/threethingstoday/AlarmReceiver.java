@@ -17,11 +17,15 @@ package com.stephenmcgruer.threethingstoday;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
-public class ThreeThingsReceiver extends BroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver {
+    private static final String TAG = "AlarmReceiver";
+
     @Override
     public void onReceive(Context context, Intent unused) {
-        Intent intent = new Intent(context, ThreeThingsNotificationIntentService.class);
+        Log.d(TAG, "onReceive: alarm fired");
+        Intent intent = new Intent(context, NotificationIntentService.class);
         context.startService(intent);
     }
 }
