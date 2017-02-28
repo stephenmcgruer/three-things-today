@@ -6,4 +6,8 @@
     <item
         android:id="@+id/mi_import_database"
         android:title="Import Database" />
+    <item
+        android:id="@+id/mi_test_notification"
+        android:title="@string/test_notification"
+        android:visible="false" />
 </menu>

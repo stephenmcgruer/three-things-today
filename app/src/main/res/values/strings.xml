@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ThreeThingsToday</string>
+    <string name="test_notification">Test Notification</string>
 </resources>

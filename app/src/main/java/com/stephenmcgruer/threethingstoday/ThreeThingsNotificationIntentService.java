@@ -33,6 +33,7 @@ public class ThreeThingsNotificationIntentService extends IntentService {
         // TODO(smcgruer): Skip if today is already done.
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setAutoCancel(true)
                 .setContentTitle("Three Things Today")
                 .setContentText("Record what happened today!")
                 .setDefaults(NotificationCompat.DEFAULT_ALL)

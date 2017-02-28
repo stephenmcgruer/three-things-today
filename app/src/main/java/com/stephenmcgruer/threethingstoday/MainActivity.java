@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     private static final int DATABASE_IMPORT_CODE = 0;
 
+    private static final boolean DEBUG_MODE = false;
+
     private ThreeThingsDatabase mThreeThingsDatabase = null;
 
     private final Timer mWriteDatabaseTimer = new Timer();
@@ -127,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        if (DEBUG_MODE) {
+            menu.findItem(R.id.mi_test_notification).setVisible(true);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -148,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             Toast.LENGTH_LONG).show();
                 }
                 return true;
+            case R.id.mi_test_notification:
+                Intent notificationIntent = new Intent(this, ThreeThingsNotificationIntentService.class);
+                startService(notificationIntent);
             default:
                 return super.onOptionsItemSelected(item);
         }
