@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "483332711255",
+    "firebase_url": "https://three-things-ba44a.firebaseio.com",
+    "project_id": "three-things-ba44a",
+    "storage_bucket": "three-things-ba44a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483332711255:android:2b4573383727b3b2",
+        "android_client_info": {
+          "package_name": "com.stephenmcgruer.android.threethings"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "483332711255-ql5cuc6eilte2cd8n9jm5askh823vpe9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU1V-TQUMWBT3k0LpS_HfJmTy1TA0Vw_c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483332711255:android:74dea9aef1696791",
+        "android_client_info": {
+          "package_name": "com.stephenmcgruer.threethingstoday"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "483332711255-ql5cuc6eilte2cd8n9jm5askh823vpe9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU1V-TQUMWBT3k0LpS_HfJmTy1TA0Vw_c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

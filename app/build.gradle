@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.stephenmcgruer.threethingstoday"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -27,4 +27,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'net.sf.opencsv:opencsv:2.3'
     testCompile 'junit:junit:4.12'
+
+    compile 'com.firebaseui:firebase-ui-auth:1.2.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

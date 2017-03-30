@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -41,6 +42,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsContract.ThreeThingsEntry;
 import com.stephenmcgruer.threethingstoday.database.ThreeThingsDatabase;
 
@@ -48,6 +51,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         View.OnFocusChangeListener, TextWatcher {
 
     private static final int DATABASE_IMPORT_CODE = 0;
+    private static final int FIREBASE_SIGN_IN_CODE = 1;
 
     private static final boolean DEBUG_MODE = false;
 
@@ -71,6 +76,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // Required to update the sign-in/sign-out menu item.
+                invalidateOptionsMenu();
+            }
+        });
 
         mThreeThingsDatabase = new ThreeThingsDatabase(getApplicationContext());
 
@@ -108,6 +121,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        menu.findItem(R.id.mi_sign_in_sign_out).setTitle(auth.getCurrentUser() == null
+                ? getString(R.string.sign_in_text)
+                : getString(R.string.sign_out_text));
+
         if (DEBUG_MODE) {
             menu.findItem(R.id.mi_test_notification).setVisible(true);
         }
@@ -132,9 +151,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             Toast.LENGTH_LONG).show();
                 }
                 return true;
+            case R.id.mi_sign_in_sign_out:
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                    Intent signInIntent = AuthUI.getInstance().createSignInIntentBuilder()
+                            .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
+                            .build();
+                    startActivityForResult(signInIntent, FIREBASE_SIGN_IN_CODE);
+                } else {
+                    FirebaseAuth.getInstance().signOut();
+                    Toast.makeText(this, "Signed out", Toast.LENGTH_SHORT).show();
+                }
+                return true;
             case R.id.mi_test_notification:
                 Intent notificationIntent = new Intent(this, NotificationIntentService.class);
                 startService(notificationIntent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -164,6 +195,10 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             })
                             .setNegativeButton("Cancel", null).show();
                 }
+                break;
+            case FIREBASE_SIGN_IN_CODE:
+                // TODO(smcgruer): Handle.
+                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

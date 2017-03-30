@@ -7,6 +7,9 @@
         android:id="@+id/mi_import_database"
         android:title="@string/import_database" />
     <item
+        android:id="@+id/mi_sign_in_sign_out"
+        android:title="@string/sign_in_text" />
+    <item
         android:id="@+id/mi_test_notification"
         android:title="@string/test_notification"
         android:visible="false" />
